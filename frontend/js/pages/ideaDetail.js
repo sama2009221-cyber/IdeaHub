@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 filesContainer.innerHTML += `
                     <div style="padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-size: 14px;">${escapeHTML(fileName)}</span>
-                        <a href="http://localhost:8000${f.file}" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 13px;">تحميل / عرض</a>
+                        <a href="https://ideahub-production-67f3.up.railway.app${f.file}" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 13px;">تحميل / عرض</a>
                     </div>
                 `;
             });

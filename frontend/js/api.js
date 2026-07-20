@@ -1,6 +1,6 @@
 import { getAccessToken, refreshToken } from './auth.js';
 
-const BASE_URL = 'https://stunning-youth-production.up.railway.app/api';
+const BASE_URL = 'https://ideahub-production-67f3.up.railway.app/api';
 
 class ApiError extends Error {
     constructor(status, payload) {

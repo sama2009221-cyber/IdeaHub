@@ -37,10 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
         } catch (error) {
-            let errorText = 'Registration failed. ';
+            let errorText = 'فشل التسجيل: ';
             if (error.payload) {
-                if (error.payload.username) errorText += `Username: ${error.payload.username.join(' ')} `;
-                if (error.payload.password) errorText += `Password: ${error.payload.password.join(' ')} `;
+                if (error.payload.username) errorText += 'الاسم مسجل مسبقاً، يرجى اختيار اسم آخر. ';
+                if (error.payload.password) errorText += 'كلمة المرور غير صالحة. ';
             }
             errorMsg.textContent = errorText;
             errorMsg.classList.remove('hidden');

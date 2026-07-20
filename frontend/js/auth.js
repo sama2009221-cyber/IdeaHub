@@ -16,7 +16,7 @@ export async function refreshToken() {
     const refresh = localStorage.getItem('refresh_token');
     if (!refresh) throw new Error('No refresh token available');
 
-    const res = await fetch('http://localhost:8000/api/auth/refresh/', {
+    const res = await fetch('https://ideahub-production-67f3.up.railway.app/api/auth/refresh/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh })
