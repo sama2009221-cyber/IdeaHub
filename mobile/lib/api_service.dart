@@ -7,7 +7,7 @@ class ApiService {
   // For Android emulator use: http://10.0.2.2:8000/api
   // For physical device use your machine's local IP: http://192.168.x.x:8000/api
   // For web/Chrome testing use: http://localhost:8000/api
-  static const String baseUrl = 'http://10.0.2.2:8000/api';
+  static const String baseUrl = 'https://ideahub-production-67f3.up.railway.app/api';
 
   // ─── Token Management ─────────────────────────────────────────────────────
 
