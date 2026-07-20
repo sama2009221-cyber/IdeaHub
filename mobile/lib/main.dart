@@ -28,7 +28,7 @@ class IdeaHubApp extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
-              backgroundColor: IdeaHubTheme.bgBase,
+              backgroundColor: IdeaHubTheme.bgCanvas,
               body: Center(child: CircularProgressIndicator()),
             );
           }
