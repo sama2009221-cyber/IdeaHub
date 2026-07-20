@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الأفكار — IdeaHub</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+    <!-- ── Header ──────────────────────────────────────────────────────── -->
+    <header class="header">
+        <a href="dashboard.html" style="text-decoration:none;color:inherit;">
+            <div class="brand">
+                <div class="brand-mark">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0012 2z"
+                            stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                IdeaHub
+            </div>
+        </a>
+        
+        <nav>
+            <a class="nav-link" href="https://github.com/sama2009221-cyber/IdeaHub/releases/latest" target="_blank" style="display:flex; align-items:center; gap:6px; color: var(--accent);">
+                <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+                    <path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                تطبيق الموبايل
+            </a>
+            <div class="nav-sep"></div>
+            <a class="nav-link" href="evaluations.html">بوابة المديرين</a>
+            <div class="nav-sep"></div>
+            <a class="nav-link" href="login.html">تسجيل الخروج</a>
+            <button class="btn btn-primary" onclick="window.location.href='submit-idea.html'">
+                <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
+                    <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                </svg>
+                فكرة جديدة
+            </button>
+        </nav>
+    </header>
+
+    <!-- ── Main Content ────────────────────────────────────────────────── -->
+    <main class="main-content">
+        
+        <!-- Breadcrumbs -->
+        <div class="crumbs">
+            <svg viewBox="0 0 24 24" fill="none">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            IdeaHub <span>/</span> <b>لوحة الأفكار</b>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-head">
+            <div>
+                <h1>لوحة الأفكار</h1>
+                <p>نظرة عامة على جميع الأفكار والمقترحات المُقدمة</p>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats" id="stats">
+            <!-- Populated via JS -->
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+                    <path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+                <input type="text" placeholder="ابحث عن فكرة، أو اسم مُقدم...">
+            </div>
+            <div class="chips" id="statusChips">
+                <button class="chip active" data-status="all">الكل</button>
+                <button class="chip" data-status="review">قيد المراجعة</button>
+                <button class="chip" data-status="progress">قيد التنفيذ</button>
+                <button class="chip" data-status="done">مُكتملة</button>
+            </div>
+        </div>
+
+        <!-- Section: New / Under Review -->
+        <div class="section">
+            <div class="section-head">
+                <div class="section-title">
+                    <div class="dot" style="background:rgba(108,95,245,.14)">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z" stroke="var(--accent)"
+                                stroke-width="1.8" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    الأفكار الجديدة وقيد المراجعة
+                    <span class="count-pill" id="newCount">—</span>
+                </div>
+                <span class="section-sub">أفكار تنتظر التقييم والاعتماد</span>
+            </div>
+            
+            <div class="grid" id="newIdeasGrid">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+
+        <!-- Section: Evaluated / In Progress -->
+        <div class="section">
+            <div class="section-head">
+                <div class="section-title">
+                    <div class="dot" style="background:rgba(52,211,153,.14)">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    الأفكار المُعتمدة وقيد التنفيذ
+                    <span class="count-pill" id="evalCount">—</span>
+                </div>
+                <span class="section-sub">أفكار تم تقييمها ودخلت حيز التنفيذ</span>
+            </div>
+            
+            <div class="grid" id="evalGrid">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module" src="js/pages/dashboard.js"></script>
+</body>
+</html>

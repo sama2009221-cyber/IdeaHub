@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء حساب - IdeaHub</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body style="display: flex; justify-content: center; align-items: center; min-height: 100vh; position: relative; padding: 20px;">
+    
+    <div class="glass-panel" style="width: 100%; max-width: 520px; text-align: center; position: relative; z-index: 10; margin-top: 40px; margin-bottom: 40px; padding: 40px;">
+        
+        <div style="margin-bottom: var(--space-32);">
+            <div style="width: 64px; height: 64px; margin: 0 auto var(--space-16); background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <img src="assets/logo.png" alt="IdeaHub Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;">
+            </div>
+            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">إنشاء حساب</h2>
+            <p style="color: var(--text-dim); font-size: 14px;">انضم إلى فريقك على منصة IdeaHub</p>
+        </div>
+
+        <form id="register-form" style="text-align: right;">
+            <div class="form-group">
+                <label class="form-label" for="username">اسم المستخدم</label>
+                <div style="position: relative;">
+                    <i class="ph ph-user" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--text-faint); font-size: 20px;"></i>
+                    <input type="text" id="username" class="form-input" style="padding-right: 44px; padding-left: 16px;" placeholder="اختر اسم مستخدم" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">البريد الإلكتروني (اختياري)</label>
+                <div style="position: relative;">
+                    <i class="ph ph-envelope" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--text-faint); font-size: 20px;"></i>
+                    <input type="email" id="email" class="form-input" style="padding-right: 44px; padding-left: 16px;" placeholder="you@company.com">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="company_name">اسم الشركة</label>
+                <div style="position: relative;">
+                    <i class="ph ph-buildings" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--text-faint); font-size: 20px;"></i>
+                    <input type="text" id="company_name" class="form-input" style="padding-right: 44px; padding-left: 16px;" placeholder="مثال: شركة التقنية" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="role">دورك الوظيفي</label>
+                <div style="position: relative;">
+                    <i class="ph ph-identification-badge" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--text-faint); font-size: 20px;"></i>
+                    <select id="role" class="form-input" style="padding-right: 44px; padding-left: 16px; appearance: auto;" required>
+                        <option value="" disabled selected>اختر دورك الوظيفي</option>
+                        <option value="employee">موظف</option>
+                        <option value="manager">مدير قسم</option>
+                        <option value="owner">المالك / المدير التنفيذي</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: var(--space-32);">
+                <label class="form-label" for="password">كلمة المرور</label>
+                <div style="position: relative;">
+                    <i class="ph ph-lock-key" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--text-faint); font-size: 20px;"></i>
+                    <input type="password" id="password" class="form-input" style="padding-right: 44px; padding-left: 16px;" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; font-size: 16px;">
+                إنشاء الحساب
+            </button>
+        </form>
+        
+        <div id="error-message" class="hidden" style="color: var(--red); margin-top: 16px; font-size: 14px; background: rgba(242, 104, 92, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(242, 104, 92, 0.2);"></div>
+        <div id="success-message" class="hidden" style="color: var(--green); margin-top: 16px; font-size: 14px; background: rgba(63, 217, 164, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(63, 217, 164, 0.2);"></div>
+        
+        <div style="margin-top: 32px; text-align: center;">
+            <p style="color: var(--text-dim); font-size: 14px;">
+                لديك حساب بالفعل؟ <a href="login.html" class="nav-link" style="font-weight: 600; color: var(--accent);">تسجيل الدخول</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script type="module" src="js/pages/register.js"></script>
+</body>
+</html>
+

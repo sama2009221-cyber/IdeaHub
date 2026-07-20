@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقييمات المدراء - IdeaHub</title>
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .split-dashboard {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+            height: calc(100vh - 90px);
+        }
+        .idea-list {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            overflow-y: auto;
+        }
+        .idea-card {
+            padding: 16px;
+            border: 1px solid var(--border-soft);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .idea-card:hover, .idea-card.active {
+            border-color: var(--accent);
+            background: var(--surface-2);
+        }
+        .eval-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            overflow-y: auto;
+            display: none; /* hidden until idea selected */
+        }
+        .ai-eval-box {
+            background: rgba(95,168,245,.06);
+            border: 1px solid rgba(95,168,245,.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+        .score-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .score-pill {
+            background: var(--surface-2);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--blue);
+            border: 1px solid var(--border-soft);
+        }
+        .human-eval-box {
+            background: var(--surface-2);
+            border: 1px solid var(--border-soft);
+            border-radius: 12px;
+            padding: 24px;
+        }
+    </style>
+</head>
+<body>
+    
+    <header class="header">
+        <a href="dashboard.html" style="text-decoration: none; color: inherit;">
+            <div class="brand flex items-center gap-2">
+                <div class="logo-icon" style="background: linear-gradient(135deg, var(--accent), var(--accent-2)); width: 36px; height: 36px; border-radius: 10px;">
+                    <img src="assets/logo.png" alt="IdeaHub Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 10px;">
+                </div>
+                <span style="font-size: 20px; font-weight: 700; font-family: 'Sora', sans-serif;">IdeaHub</span>
+                <span style="color: var(--text-faint); font-size: 14px; margin-right: 8px;">بوابة المدراء</span>
+            </div>
+        </a>
+        <div class="flex items-center gap-4">
+            <a href="chat.html" class="btn btn-secondary"><i class="ph ph-chat-teardrop"></i> دردشة مع الأفكار</a>
+        </div>
+    </header>
+
+    <main class="split-dashboard">
+        <!-- List of targeted ideas (RTL) -->
+        <div class="idea-list" id="idea-list-container">
+            <h3 style="margin-bottom: 16px; font-size: 18px;">الأفكار بانتظار المراجعة</h3>
+            <div id="ideas-wrapper">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+
+        <!-- Detail and Eval Panel (RTL) -->
+        <div class="eval-panel" id="eval-panel">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                <div>
+                    <h1 id="detail-title" style="font-size: 32px; margin-bottom: 8px;">اختر فكرة</h1>
+                    <p id="detail-author" style="color: var(--text-faint);">مُقدمة بواسطة ...</p>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 32px; font-size: 16px; line-height: 1.6; color: var(--text-dim);" id="detail-desc">
+                <!-- Description -->
+            </div>
+
+            <!-- AI Evaluation Box -->
+            <div class="ai-eval-box" id="ai-eval-box">
+                <h3 style="display: flex; align-items: center; gap: 8px; color: var(--text); margin-bottom: 16px;">
+                    <i class="ph-fill ph-sparkle" style="color: var(--blue);"></i> تقييم الذكاء الاصطناعي
+                </h3>
+                <div class="score-row">
+                    <div class="score-pill">المفهوم: <span id="ai-concept">0</span>/10</div>
+                    <div class="score-pill">الجدوى: <span id="ai-feasibility">0</span>/10</div>
+                    <div class="score-pill">التطبيق: <span id="ai-application">0</span>/10</div>
+                </div>
+                <p id="ai-notes" style="color: var(--text-dim); line-height: 1.5;">جاري إنشاء تحليل الذكاء الاصطناعي...</p>
+            </div>
+
+            <!-- Manager Human Evaluation Form -->
+            <div class="human-eval-box">
+                <h3 style="margin-bottom: 16px;">أضف تقييمك</h3>
+                <form id="eval-form" style="text-align: right;">
+                    <input type="hidden" id="eval-idea-id">
+                    <div class="form-group">
+                        <label class="form-label">الدرجة الرقمية (1-10)</label>
+                        <input type="number" id="human-score" class="form-input" min="1" max="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">الملاحظات والتعليقات</label>
+                        <textarea id="human-notes" class="form-input" rows="4" placeholder="ما الذي يحتاج إلى تحسين؟" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">إرسال التقييم</button>
+                    <div id="eval-success" style="color: var(--green); margin-top: 8px; display: none;">تم حفظ التقييم بنجاح!</div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="js/pages/evaluations.js"></script>
+</body>
+</html>

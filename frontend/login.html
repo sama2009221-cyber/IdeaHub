@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل الدخول — IdeaHub</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="icon" type="image/png" href="assets/logo.png">
+
+  <style>
+    :root {
+      --bg:        #0D0D14;
+      --surface:   #151522;
+      --border:    #262638;
+      --text:      #E8E7F0;
+      --text-dim:  #8A88A4;
+      --text-faint:#5A5870;
+      --accent:    #6C5FF5;
+      --accent-hover: #5A4CE3;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(108, 95, 245, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(96, 165, 250, 0.05) 0%, transparent 40%);
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-font-smoothing: antialiased;
+      padding: 24px;
+    }
+
+    /* Fix autofill styles in dark mode */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active{
+        -webkit-box-shadow: 0 0 0 30px var(--surface) inset !important;
+        -webkit-text-fill-color: var(--text) !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo-mark {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--accent), #4E42D4);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(108,95,245,.25);
+    }
+    
+    .logo-mark svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .brand-name {
+      font-family: 'Sora', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -.02em;
+    }
+
+    .brand-sub {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 12px 32px rgba(0,0,0,.4);
+      animation: riseIn .4s cubic-bezier(.4,0,.2,1);
+    }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-ico {
+      position: absolute;
+      inset-inline-start: 14px; /* Icon on the left */
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-faint);
+      display: flex;
+      pointer-events: none;
+    }
+    .input-ico svg { width: 18px; height: 18px; }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 14px 12px 42px; /* padding on left for icon */
+      background: rgba(0,0,0,.15);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14.5px;
+      outline: none;
+      transition: all .2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent);
+      background: rgba(0,0,0,.3);
+      box-shadow: 0 0 0 3px rgba(108,95,245,.15);
+    }
+
+    .btn-login {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background .2s, transform .1s;
+    }
+
+    .btn-login:hover {
+      background: var(--accent-hover);
+    }
+    .btn-login:active {
+      transform: translateY(1px);
+    }
+
+    .error-box {
+      display: none;
+      margin-top: 16px;
+      background: rgba(248,113,113,.1);
+      border: 1px solid rgba(248,113,113,.2);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #F87171;
+      align-items: center;
+      gap: 8px;
+    }
+    .error-box.show { display: flex; }
+    .error-box svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .footer-links {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 13.5px;
+      color: var(--text-faint);
+    }
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color .2s;
+    }
+    .footer-links a:hover {
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    
+    <div class="brand-header">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0012 2z"
+            stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="brand-name">IdeaHub Enterprise</div>
+      <div class="brand-sub">بوابة إدارة الأفكار الداخلية</div>
+    </div>
+
+    <div class="login-card">
+      <div class="login-title">تسجيل الدخول للنظام</div>
+
+      <form id="login-form" autocomplete="on">
+        <div class="form-group">
+          <label class="form-label" for="username">اسم المستخدم</label>
+          <div class="input-wrap">
+            <span class="input-ico">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <input type="text" id="username" class="form-input" dir="ltr" style="text-align: right;" autocomplete="username" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">كلمة المرور</label>
+          <div class="input-wrap">
+            <span class="input-ico">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <input type="password" id="password" class="form-input" dir="ltr" style="text-align: right;" autocomplete="current-password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login" id="submit-btn">
+          تسجيل الدخول
+        </button>
+      </form>
+
+      <div class="error-box" id="error-message">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span id="error-text">اسم المستخدم أو كلمة المرور غير صحيحة</span>
+      </div>
+
+    </div>
+
+    <div class="footer-links">
+      ليس لديك حساب؟ <a href="register.html">طلب إنشاء حساب موظف</a>
+    </div>
+
+  </div>
+
+  <script type="module" src="js/pages/login.js"></script>
+</body>
+</html>

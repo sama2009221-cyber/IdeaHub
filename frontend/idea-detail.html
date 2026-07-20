@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تفاصيل الفكرة — IdeaHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <style>
+    /* ─── Page Layout ─────────────────────────────────────────────── */
+    .detail-wrap {
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 32px 40px 80px;
+    }
+
+    /* ─── Hero Header ─────────────────────────────────────────────── */
+    .idea-hero {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 18px;
+      padding: 32px 36px;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+      animation: rise .35s ease both;
+    }
+    .idea-hero::before {
+      content:'';
+      position:absolute; inset-inline-start:0; top:0; bottom:0;
+      width: 4px;
+      background: linear-gradient(180deg, var(--accent), var(--blue));
+      border-radius: 4px 0 0 4px;
+    }
+    .idea-hero::after {
+      content:'';
+      position:absolute; top:-80px; inset-inline-end:-80px;
+      width:300px; height:300px;
+      background: radial-gradient(circle, rgba(124,108,246,.07) 0%, transparent 70%);
+      pointer-events:none;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .hero-title {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--text);
+      margin: 0 0 14px;
+      line-height: 1.25;
+    }
+
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .meta-sep { color: var(--border); font-size: 18px; }
+
+    .author-chip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    .author-chip .av {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: #fff;
+    }
+
+    /* ─── Two-column layout ───────────────────────────────────────── */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ─── Panel base ──────────────────────────────────────────────── */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      overflow: hidden;
+      animation: rise .35s ease both;
+    }
+
+    /* ─── Tabs ────────────────────────────────────────────────────── */
+    .tab-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border-soft);
+      background: var(--surface-2);
+    }
+    .tab {
+      padding: 14px 22px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-faint);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color .15s, border-color .15s;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .tab:hover { color: var(--text-dim); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .tab-content { display: none; padding: 28px; }
+    .tab-content.active { display: block; animation: fadeIn .2s ease; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+    /* ─── Description text ────────────────────────────────────────── */
+    .idea-desc {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--text-dim);
+      white-space: pre-wrap;
+      margin-bottom: 28px;
+    }
+
+    .files-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 12px;
+    }
+    .file-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-soft);
+      border-radius: 9px;
+      margin-bottom: 8px;
+    }
+    .file-row span { font-size: 13.5px; color: var(--text-dim); }
+    .file-row a { font-size: 12.5px; color: var(--accent); font-weight: 600; }
+    .file-row a:hover { color: var(--accent-3); }
+
+    /* version item */
+    .ver-item {
+      padding: 14px 16px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .ver-item strong { font-size: 13px; color: var(--text); }
+    .ver-item p { font-size: 12.5px; color: var(--text-faint); margin-top: 5px; line-height: 1.5; }
+
+    /* ─── Sidebar panels ──────────────────────────────────────────── */
+    .sidebar { display: flex; flex-direction: column; gap: 18px; }
+
+    .side-panel {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      overflow: hidden;
+      animation: rise .35s ease both;
+    }
+
+    .side-panel-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-soft);
+      background: var(--surface-2);
+    }
+    .side-panel-head h3 { font-size: 14px; font-weight: 700; margin: 0; color: var(--text); }
+    .side-panel-head .ico {
+      width: 28px; height: 28px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .side-panel-body { padding: 20px; }
+
+    /* AI Score panel */
+    .ai-scores-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .score-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+    .score-box .s-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text-faint);
+      margin-bottom: 6px;
+    }
+    .score-box .s-val {
+      font-family: 'Sora', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .score-box .s-bar {
+      width: 100%; height: 3px;
+      background: var(--surface-3);
+      border-radius: 99px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .score-box .s-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width .6s cubic-bezier(.4,0,.2,1);
+    }
+
+    .ai-overall-score {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 18px;
+    }
+    .ai-big-score {
+      font-family: 'Sora', sans-serif;
+      font-size: 42px; font-weight: 800; line-height: 1;
+      letter-spacing: -.04em;
+    }
+    .ai-big-label { font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; }
+
+    .ai-notes-text {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.7;
+      background: var(--surface-2);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 14px;
+      white-space: pre-wrap;
+    }
+
+    /* Rating widget */
+    .stars-row {
+      display: flex; gap: 6px; margin-bottom: 16px;
+    }
+    .star-btn {
+      background: none; border: none; cursor: pointer;
+      padding: 4px; border-radius: 6px;
+      color: var(--border);
+      font-size: 22px;
+      transition: color .12s, transform .12s;
+    }
+    .star-btn:hover, .star-btn.active { color: var(--amber); transform: scale(1.15); }
+
+    /* Chat widget */
+    .chat-messages {
+      height: 260px;
+      overflow-y: auto;
+      display: flex; flex-direction: column;
+      gap: 10px;
+      padding: 16px;
+      scroll-behavior: smooth;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+    .msg-empty {
+      text-align: center; color: var(--text-faint);
+      font-size: 12.5px; margin: auto; line-height: 1.6;
+    }
+    .msg-user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      padding: 9px 14px;
+      border-radius: 14px 14px 0 14px;
+      max-width: 85%;
+      font-size: 13px; line-height: 1.5;
+      word-break: break-word;
+    }
+    .msg-ai {
+      align-self: flex-start;
+      background: var(--surface-2);
+      border: 1px solid var(--border-soft);
+      color: var(--text-dim);
+      padding: 9px 14px;
+      border-radius: 14px 14px 14px 0;
+      max-width: 90%;
+      font-size: 13px; line-height: 1.6;
+      word-break: break-word;
+    }
+    .msg-ai.thinking {
+      color: var(--text-faint);
+      font-style: italic;
+    }
+    .msg-error {
+      color: var(--red);
+      font-size: 12px;
+      align-self: flex-start;
+      padding: 8px 12px;
+      background: rgba(248,113,113,.07);
+      border-radius: 8px;
+    }
+
+    .chat-form {
+      display: flex; gap: 8px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--border-soft);
+    }
+    .chat-input {
+      flex: 1;
+      background: var(--surface-2);
+      border: 1px solid var(--border-soft);
+      border-radius: 9px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .chat-input:focus { border-color: var(--accent); }
+    .chat-input::placeholder { color: var(--text-faint); }
+
+    .chat-send {
+      width: 38px; height: 38px;
+      border-radius: 9px;
+      border: none; cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .chat-send:hover { transform: translateY(-1px); box-shadow: 0 4px 12px var(--accent-glow); }
+    .chat-send svg { width: 16px; height: 16px; }
+
+    /* form inputs inside side panel */
+    .rating-input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border-soft);
+      border-radius: 9px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: inherit; font-size: 14px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .rating-input:focus { border-color: var(--accent); }
+    .rating-textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+    /* ─── Loading skeleton ────────────────────────────────────────── */
+    .loading-hero {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 18px;
+      padding: 32px 36px;
+      margin-bottom: 28px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+
+    /* ─── Comment thread ──────────────────────────────────────────── */
+    .comment-item {
+      display: flex; gap: 12px; margin-bottom: 16px;
+    }
+    .comment-av {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .comment-body { flex: 1; }
+    .comment-meta {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 5px;
+    }
+    .comment-author { font-size: 13px; font-weight: 700; color: var(--text); }
+    .comment-time { font-size: 11.5px; color: var(--text-faint); }
+    .comment-text { font-size: 13.5px; color: var(--text-dim); line-height: 1.6; }
+
+    .comment-form { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* ─── Status color map ────────────────────────────────────────── */
+    @media (max-width: 960px) {
+      .detail-grid { grid-template-columns: 1fr; }
+      .sidebar { order: -1; }
+    }
+    @media (max-width: 640px) {
+      .detail-wrap { padding: 20px 16px 60px; }
+      .idea-hero { padding: 22px 20px; }
+      .ai-scores-row { grid-template-columns: repeat(3,1fr); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── Navbar ──────────────────────────────────────────────────── -->
+  <header class="header">
+    <a href="dashboard.html" style="text-decoration:none;color:inherit;">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0012 2z"
+              stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        IdeaHub
+      </div>
+    </a>
+    <a href="dashboard.html" class="btn btn-ghost btn-sm">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      العودة
+    </a>
+  </header>
+
+  <!-- ── Main ────────────────────────────────────────────────────── -->
+  <div class="detail-wrap">
+
+    <!-- Loading skeleton -->
+    <div id="loading-state">
+      <div class="loading-hero">
+        <div class="skel skel-h1" style="width:55%;height:24px;"></div>
+        <div class="skel skel-h2" style="width:30%;height:14px;"></div>
+      </div>
+    </div>
+
+    <!-- Actual content (hidden until loaded) -->
+    <div id="idea-details" class="hidden">
+
+      <!-- Hero -->
+      <div class="idea-hero">
+        <div class="hero-top">
+          <div style="flex:1">
+            <h1 class="hero-title" id="idea-title"></h1>
+            <div class="hero-meta">
+              <span id="idea-status" class="badge"></span>
+              <span id="idea-category" class="badge" style="background:var(--accent-soft);color:var(--accent-3);border:1px solid rgba(124,108,246,.2)"></span>
+              <span class="meta-sep">·</span>
+              <div class="author-chip">
+                <div class="av" id="idea-avatar"></div>
+                <span id="idea-author"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div class="detail-grid">
+
+        <!-- ── Main column ─────────────────────────────────────── -->
+        <div class="panel">
+          <div class="tab-bar">
+            <button class="tab active" data-target="tab-description">الوصف</button>
+            <button class="tab" data-target="tab-versions">الإصدارات</button>
+            <button class="tab" data-target="tab-comments">التعليقات</button>
+          </div>
+
+          <!-- Tab: Description -->
+          <div id="tab-description" class="tab-content active">
+            <div id="idea-description" class="idea-desc"></div>
+            <div class="files-title">الملفات المرفقة</div>
+            <div id="idea-files"></div>
+          </div>
+
+          <!-- Tab: Versions -->
+          <div id="tab-versions" class="tab-content">
+            <div id="versions-list"></div>
+          </div>
+
+          <!-- Tab: Comments -->
+          <div id="tab-comments" class="tab-content">
+            <div id="comments-thread-container"></div>
+          </div>
+        </div>
+
+        <!-- ── Sidebar ─────────────────────────────────────────── -->
+        <div class="sidebar">
+          <div id="ai-notes-container"></div>
+          <div id="ratings-widget-container"></div>
+          <div id="chat-widget-container"></div>
+        </div>
+      </div>
+
+    </div><!-- /#idea-details -->
+  </div><!-- /.detail-wrap -->
+
+  <script type="module" src="js/pages/ideaDetail.js?v=3"></script>
+</body>
+</html>

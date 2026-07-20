@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صندوق الوارد - IdeaHub</title>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body>
+    
+    <header class="header">
+        <a href="dashboard.html" style="text-decoration: none; color: inherit;">
+            <div class="brand flex items-center gap-2">
+                <div class="logo-icon" style="background: linear-gradient(135deg, var(--accent), var(--accent-2)); width: 36px; height: 36px; border-radius: 10px;">
+                    <img src="assets/logo.png" alt="IdeaHub Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 10px;">
+                </div>
+                <span style="font-size: 20px; font-weight: 700; font-family: 'Sora', sans-serif;">IdeaHub</span>
+            </div>
+        </a>
+        <div class="flex items-center gap-4">
+            <a href="dashboard.html" class="btn btn-secondary" style="border:none;">العودة للوحة القيادة</a>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <div class="flex justify-between items-center" style="margin-bottom: 32px;">
+            <div>
+                <h2 style="font-size: 24px; margin-bottom: 8px;">بانتظار التقييم</h2>
+                <p style="color: var(--text-dim); font-size: 14px; margin-bottom: 8px;">الأفكار المخصصة لك لتقييمها.</p>
+            </div>
+        </div>
+        
+        <div id="loading-state" style="text-align: center; padding: 12px; color: var(--text-dim);">
+            جاري تحميل التعيينات...
+        </div>
+
+        <div id="inbox-list" class="flex flex-col gap-4">
+            <!-- Rendered via JS -->
+        </div>
+    </main>
+
+    <script type="module">
+        import { apiFetch } from './js/api.js';
+        import { createIdeaCard } from './js/components/ideaCard.js';
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            const list = document.getElementById('inbox-list');
+            const loading = document.getElementById('loading-state');
+            
+            try {
+                // Mocking endpoint for now, in real life it would be /ideas/?evaluator=me
+                const ideas = await apiFetch('/ideas/'); 
+                loading.classList.add('hidden');
+                
+                if (ideas.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color: var(--text-dim);">لا توجد أفكار مخصصة لك في الوقت الحالي.</p>';
+                    return;
+                }
+                
+                ideas.forEach(idea => {
+                    // For the inbox, we can just reuse the idea card
+                    list.appendChild(createIdeaCard(idea));
+                });
+            } catch (error) {
+                loading.textContent = 'حدث خطأ أثناء تحميل صندوق الوارد.';
+            }
+        });
+    </script>
+</body>
+</html>

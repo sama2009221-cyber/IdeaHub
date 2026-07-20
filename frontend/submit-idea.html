@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقديم فكرة — IdeaHub</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+
+    <style>
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 48px;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 48px 40px;
+        }
+
+        .editor-section { position: relative; }
+
+        .editor-title {
+            font-size: clamp(32px, 4vw, 42px);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 12px;
+            color: var(--text);
+            letter-spacing: -.03em;
+        }
+
+        .editor-subtitle {
+            font-size: 16px;
+            color: var(--text-dim);
+            margin-bottom: 48px;
+            line-height: 1.6;
+        }
+
+        .input-title {
+            width: 100%;
+            background: transparent;
+            border: none;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            padding: 16px 0;
+            outline: none;
+            font-family: inherit;
+            margin-bottom: 16px;
+            transition: color .2s;
+        }
+        .input-title::placeholder { color: var(--text-faint); }
+        .input-title:focus::placeholder { color: transparent; }
+
+        .input-body {
+            width: 100%;
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            line-height: 1.75;
+            color: var(--text-dim);
+            min-height: 400px;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+            padding: 24px 0;
+        }
+        .input-body::placeholder { color: var(--text-faint); }
+        .input-body:focus::placeholder { color: transparent; }
+
+        .file-drop {
+            background: var(--surface-2);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--dur) var(--ease);
+            position: relative;
+            margin-top: 32px;
+        }
+        .file-drop:hover {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+        .file-drop input[type="file"] {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            opacity: 0; cursor: pointer;
+        }
+        .file-ico {
+            display: inline-flex;
+            align-items: center; justify-content: center;
+            width: 48px; height: 48px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+        .file-drop h4 { font-size: 15px; margin: 0 0 6px; }
+        .file-drop p { font-size: 13px; color: var(--text-faint); margin: 0; }
+
+        .file-list {
+            margin-top: 16px;
+            display: flex; flex-direction: column; gap: 8px;
+            text-align: right;
+        }
+
+        /* AI Side Panel */
+        .ai-panel {
+            background: var(--surface);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+            animation: slideIn .4s var(--ease);
+        }
+
+        @keyframes slideIn {
+            from { opacity:0; transform:translateX(-20px); }
+            to { opacity:1; transform:translateX(0); }
+        }
+
+        .ai-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 24px;
+        }
+        .ai-header .ico {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            background: rgba(96,165,250,.12);
+            color: var(--blue);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ai-header h3 { font-size: 16px; font-weight: 700; margin: 0; }
+
+        .ai-tip {
+            background: var(--surface-2);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex; gap: 14px;
+        }
+        .ai-tip svg {
+            color: var(--accent);
+            flex-shrink: 0;
+            width: 20px; height: 20px;
+        }
+        .ai-tip strong {
+            display: block; font-size: 13.5px;
+            color: var(--text); margin-bottom: 4px;
+        }
+        .ai-tip p {
+            font-size: 12.5px; color: var(--text-dim); line-height: 1.6; margin: 0;
+        }
+
+        .ai-status {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 12.5px; color: var(--text-faint);
+            margin-top: 32px; padding-top: 24px;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        .submit-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-soft);
+        }
+        .kbd-hint {
+            display: flex; align-items: center; gap: 6px;
+            color: var(--text-faint); font-size: 13px;
+        }
+        .kbd {
+            background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: 4px; padding: 2px 6px;
+            font-family: var(--font-sans); font-size: 11px; font-weight: 600;
+        }
+
+        @media (max-width: 960px) {
+            .split-layout { grid-template-columns: 1fr; }
+            .ai-panel { display: none; /* Hide on small screens for focus */ }
+        }
+        @media (max-width: 640px) {
+            .split-layout { padding: 32px 24px; }
+            .submit-bar { flex-direction: column; gap: 16px; align-items: stretch; }
+            .kbd-hint { display: none; }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- ── Header ──────────────────────────────────────────────────────── -->
+    <header class="header">
+        <a href="dashboard.html" style="text-decoration:none;color:inherit;">
+            <div class="brand">
+                <div class="brand-mark">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0012 2z"
+                            stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                IdeaHub
+            </div>
+        </a>
+        <div class="flex items-center gap-4">
+            <button class="btn btn-ghost btn-sm" onclick="window.history.back()">إلغاء</button>
+            <button class="btn btn-secondary btn-sm">حفظ كمسودة</button>
+        </div>
+    </header>
+
+    <!-- ── Main Content ────────────────────────────────────────────────── -->
+    <main class="split-layout">
+        
+        <!-- Editor Left (RTL) -->
+        <div class="editor-section">
+            <h1 class="editor-title">ما هي فكرتك<br>الكبيرة القادمة؟</h1>
+            <p class="editor-subtitle">شارك رؤيتك ليتم دراستها وتقييمها من قِبل الفريق ونظام الذكاء الاصطناعي.</p>
+
+            <form id="submitIdeaForm">
+                <input type="text" class="input-title" id="title" placeholder="عنوان الفكرة... (مثال: نظام جديد لتبسيط الموافقات)" required>
+                
+                <textarea class="input-body" id="description" placeholder="اشرح المشكلة الحالية وكيف يحلها اقتراحك.&#10;ما هو العائد المتوقع من تنفيذ الفكرة؟" required></textarea>
+
+                <!-- File Upload Zone -->
+                <div class="file-drop" id="fileDropZone">
+                    <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.mp4,.png,.jpg,.jpeg">
+                    
+                    <div class="file-ico">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" 
+                                stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h4>ارفع الملفات المرفقة هنا</h4>
+                    <p>الحد الأقصى للملف 20MB (PDF, صور, Office)</p>
+                    
+                    <div id="fileList" class="file-list"></div>
+                </div>
+
+                <div class="submit-bar">
+                    <div class="kbd-hint">
+                        اضغط <span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> للتقديم
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" 
+                                stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        إرسال للمراجعة
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sidebar Right (RTL) -->
+        <div class="ai-panel">
+            <div class="ai-header">
+                <div class="ico">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z"
+                            stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <h3>المساعد الذكي (AI)</h3>
+            </div>
+            
+            <p style="color: var(--text-dim); font-size: 13.5px; margin-bottom: 24px; line-height: 1.6;">
+                إليك بعض النصائح لجعل فكرتك أقوى قبل تقديمها للجنة التقييم.
+            </p>
+            
+            <div class="ai-tip">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+                    <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
+                </svg>
+                <div>
+                    <strong>حدد المشكلة بوضوح</strong>
+                    <p>تأكد من توضيح المشكلة أو نقطة الألم بوضوح قبل اقتراح الحل. لماذا هذه الفكرة مهمة الآن؟</p>
+                </div>
+            </div>
+
+            <div class="ai-tip">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div>
+                    <strong>كيف سنقيس النجاح؟</strong>
+                    <p>ما هي المؤشرات (KPIs) التي ستتأثر إيجابياً إذا نفذنا الفكرة؟ التكلفة؟ وقت الإنجاز؟ الإيرادات؟</p>
+                </div>
+            </div>
+
+            <div class="ai-status">
+                <div class="pulse blue"></div>
+                المساعد الذكي جاهز لمراجعة فكرتك...
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module" src="js/pages/submitIdea.js?v=4"></script>
+</body>
+</html>
