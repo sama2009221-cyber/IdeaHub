@@ -144,3 +144,6 @@ REST_FRAMEWORK = {
 import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+AUTHENTICATION_BACKENDS = ['core.backends.EmailBackend', 'django.contrib.auth.backends.ModelBackend']
+

@@ -10,17 +10,20 @@ document.addEventListener('DOMContentLoaded', () => {
         errorMsg.classList.add('hidden');
         successMsg.classList.add('hidden');
         
-        const username = document.getElementById('username').value;
+        const first_name = document.getElementById('first_name').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const company_name = document.getElementById('company_name').value;
         const role = document.getElementById('role').value;
 
+        // Generate a valid username for Django backend
+        const username = email.split('@')[0] + Math.floor(Math.random() * 10000);
+
         try {
             await apiFetch('/auth/register/', {
                 method: 'POST',
                 auth: false, // No token needed for registration
-                body: { username, email, password, company_name, role }
+                body: { username, first_name, email, password, company_name, role }
             });
             
             // Auto login after registration

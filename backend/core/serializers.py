@@ -4,20 +4,21 @@ from .models import User, Idea, IdeaVersion, Comment, IdeaEvaluation, AIEvaluati
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'role', 'department', 'company_name']
+        fields = ['id', 'username', 'email', 'first_name', 'role', 'department', 'company_name']
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'role', 'department', 'company_name']
+        fields = ['id', 'username', 'email', 'password', 'first_name', 'role', 'department', 'company_name']
 
     def create(self, validated_data):
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data.get('email', ''),
             password=validated_data['password'],
+            first_name=validated_data.get('first_name', ''),
             role=validated_data.get('role', 'employee'),
             department=validated_data.get('department', ''),
             company_name=validated_data.get('company_name', '')
