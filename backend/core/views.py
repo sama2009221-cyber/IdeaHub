@@ -1,13 +1,49 @@
-from rest_framework import viewsets, generics
+from rest_framework import serializers, viewsets, generics
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib.auth import authenticate
 from .models import User, Idea, IdeaVersion, Comment, IdeaEvaluation, AIEvaluation, IdeaFile
-from .serializers import (UserSerializer, RegisterSerializer, IdeaSerializer,
-                          IdeaVersionSerializer, CommentSerializer,
-                          IdeaEvaluationSerializer, AIEvaluationSerializer)
+from .serializers import UserSerializer, RegisterSerializer, IdeaSerializer, IdeaVersionSerializer, CommentSerializer, IdeaEvaluationSerializer, AIEvaluationSerializer
 from .ai_service import evaluate_idea, chat_with_ideas
+
+
+class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = 'username'
+
+    def validate(self, attrs):
+        # Accept email OR username in the username field
+        login = attrs.get('username', '')
+        password = attrs.get('password', '')
+
+        # Try to find user by email first
+        user = None
+        try:
+            u = User.objects.get(email__iexact=login)
+            user = authenticate(request=self.context.get('request'), username=u.username, password=password)
+        except User.DoesNotExist:
+            pass
+
+        # Fallback: try by username
+        if user is None:
+            user = authenticate(request=self.context.get('request'), username=login, password=password)
+
+        if user is None or not user.is_active:
+            raise serializers.ValidationError({'detail': 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'})
+
+        refresh = self.get_token(user)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
+
+
+class EmailTokenObtainPairView(TokenObtainPairView):
+    serializer_class = EmailTokenObtainPairSerializer
+
 
 
 class RegisterView(generics.CreateAPIView):
