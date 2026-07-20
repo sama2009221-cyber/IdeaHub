@@ -42,8 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             let errorText = 'فشل التسجيل: ';
             if (error.payload) {
-                if (error.payload.username) errorText += 'الاسم مسجل مسبقاً، يرجى اختيار اسم آخر. ';
+                if (error.payload.username) errorText += 'الاسم مسجل مسبقاً. ';
+                if (error.payload.email) errorText += 'هذا البريد الإلكتروني مسجل مسبقاً. ';
                 if (error.payload.password) errorText += 'كلمة المرور غير صالحة. ';
+                if (error.payload.detail) errorText += error.payload.detail;
+            } else {
+                errorText += 'يرجى المحاولة مرة أخرى (ربما الخادم قيد التحديث الآن).';
             }
             errorMsg.textContent = errorText;
             errorMsg.classList.remove('hidden');
