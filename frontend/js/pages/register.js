@@ -26,11 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: { username, first_name, email, password, company_name, role }
             });
             
-            // Auto login after registration
+            // Auto login after registration - use email
             const loginData = await apiFetch('/auth/login/', {
                 method: 'POST',
                 auth: false,
-                body: { username, password }
+                body: { username: email, password }
             });
             
             import('../auth.js').then(async ({ setTokens, fetchUserProfile }) => {
