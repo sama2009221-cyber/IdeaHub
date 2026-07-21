@@ -72,27 +72,20 @@ class IdeaViewSet(viewsets.ModelViewSet):
     serializer_class = IdeaSerializer
 
     def get_queryset(self):
-        """Users can see ideas they created, ideas targeted to them, or all ideas from their company if they are manager/owner."""
+        """Managers and Owners see all ideas. Employees see their own or targeted ideas."""
         user = self.request.user
         if user.is_authenticated:
-            # Base ideas: owned or targeted
-            qs = Idea.objects.filter(owner=user) | Idea.objects.filter(target_audience=user)
-            
-            # If manager/owner, also include all ideas from their company
-            if user.role in ['manager', 'owner'] and user.company_name:
-                qs = qs | Idea.objects.filter(owner__company_name=user.company_name)
-                
-            return qs.distinct()
+            if user.role in ['manager', 'owner']:
+                return Idea.objects.all()
+            return (Idea.objects.filter(owner=user) | Idea.objects.filter(target_audience=user)).distinct()
         return Idea.objects.none()
 
     def perform_create(self, serializer):
         idea = serializer.save(owner=self.request.user)
 
-        # Auto-assign to managers/owners of the SAME company if no specific audience provided
+        # Auto-assign to ALL managers/owners since this is a single-company system
         if not idea.target_audience.exists():
             managers_owners = User.objects.filter(role__in=['manager', 'owner'])
-            if idea.owner.company_name:
-                managers_owners = managers_owners.filter(company_name=idea.owner.company_name)
             idea.target_audience.set(managers_owners)
 
         # Handle file uploads
