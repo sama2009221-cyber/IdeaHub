@@ -204,7 +204,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     document.getElementById('btn-save-edit').textContent = 'حفظ التعديلات';
                 }
             });
-        }
+            } // Close if (canEdit)
+        } // Close if (canEdit || canDelete)
 
         // Initialize components
         document.getElementById('ratings-widget-container').innerHTML = '';
