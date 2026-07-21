@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <strong style="color:var(--text); font-size:14px;">المدير: ${ev.evaluator_name}</strong>
                             <div style="display:flex; gap:2px;">${stars} <span style="font-size:12px; margin-inline-start:8px; color:var(--text-dim);">${ev.numeric_score}/10</span></div>
                         </div>
-                        <div style="font-size:13.5px; color:var(--text-dim); line-height:1.6; white-space:pre-wrap;">${escapeHTML(ev.feedback)}</div>
+                        <div style="font-size:13.5px; color:var(--text-dim); line-height:1.6; white-space:pre-wrap;">${escapeHTML(ev.feedback_text || '')}</div>
                     </div>`;
                 });
                 html += '</div>';
