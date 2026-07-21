@@ -80,6 +80,14 @@ class IdeaViewSet(viewsets.ModelViewSet):
             return (Idea.objects.filter(owner=user) | Idea.objects.filter(target_audience=user)).distinct()
         return Idea.objects.none()
 
+    def destroy(self, request, *args, **kwargs):
+        idea = self.get_object()
+        # Only the creator of the idea, or a high-level admin (owner/manager) can delete it
+        if idea.owner != request.user and request.user.role not in ['owner', 'manager']:
+            return Response({'detail': 'غير مصرح لك بحذف هذه الفكرة.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        return super().destroy(request, *args, **kwargs)
+
     def perform_create(self, serializer):
         idea = serializer.save(owner=self.request.user)
 

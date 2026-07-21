@@ -49,9 +49,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const isOwner = currentUser.id === idea.owner;
         const canEdit = isOwner && ['draft', 'submitted'].includes(idea.status);
+        const canDelete = isOwner;
 
-        if (canEdit) {
+        if (canEdit || canDelete) {
             document.getElementById('owner-actions').classList.remove('hidden');
+            if (!canEdit) {
+                document.getElementById('btn-edit-idea').style.display = 'none';
+            }
         }
 
         const isManager = ['manager', 'owner'].includes(currentUser.role);
@@ -144,7 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Edit/Delete actions
-        if (canEdit) {
+        if (canEdit || canDelete) {
             const editModal = document.getElementById('edit-modal');
             const editForm = document.getElementById('edit-idea-form');
 
@@ -159,10 +163,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
 
-            document.getElementById('btn-edit-idea').addEventListener('click', () => {
-                document.getElementById('edit-title').value = idea.title;
-                if (latestVersion) {
-                    document.getElementById('edit-description').value = latestVersion.description || '';
+            if (canEdit) {
+                document.getElementById('btn-edit-idea').addEventListener('click', () => {
+                    document.getElementById('edit-title').value = idea.title;
+                    if (latestVersion) {
+                        document.getElementById('edit-description').value = latestVersion.description || '';
                     document.getElementById('edit-problem').value = latestVersion.problem || '';
                     document.getElementById('edit-approach').value = latestVersion.approach || '';
                     document.getElementById('edit-impact').value = latestVersion.impact || '';
