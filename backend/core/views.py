@@ -72,19 +72,27 @@ class IdeaViewSet(viewsets.ModelViewSet):
     serializer_class = IdeaSerializer
 
     def get_queryset(self):
-        """Users can see ideas they created OR ideas targeted to them."""
+        """Users can see ideas they created, ideas targeted to them, or all ideas from their company if they are manager/owner."""
         user = self.request.user
         if user.is_authenticated:
-            return (Idea.objects.filter(owner=user) |
-                    Idea.objects.filter(target_audience=user)).distinct()
+            # Base ideas: owned or targeted
+            qs = Idea.objects.filter(owner=user) | Idea.objects.filter(target_audience=user)
+            
+            # If manager/owner, also include all ideas from their company
+            if user.role in ['manager', 'owner'] and user.company_name:
+                qs = qs | Idea.objects.filter(owner__company_name=user.company_name)
+                
+            return qs.distinct()
         return Idea.objects.none()
 
     def perform_create(self, serializer):
         idea = serializer.save(owner=self.request.user)
 
-        # Auto-assign to managers/owners if no specific audience provided
+        # Auto-assign to managers/owners of the SAME company if no specific audience provided
         if not idea.target_audience.exists():
             managers_owners = User.objects.filter(role__in=['manager', 'owner'])
+            if idea.owner.company_name:
+                managers_owners = managers_owners.filter(company_name=idea.owner.company_name)
             idea.target_audience.set(managers_owners)
 
         # Handle file uploads
@@ -297,6 +305,30 @@ class IdeaViewSet(viewsets.ModelViewSet):
             approach=approach,
             impact=impact
         )
+
+        # Trigger AI Evaluation again
+        ai_res = evaluate_idea(
+            title=idea.title,
+            description=description,
+            problem=problem,
+            approach=approach,
+            impact=impact,
+            file_paths=[f.file.path for f in idea.files.all()]
+        )
+
+        # Update or create AIEvaluation
+        ai_eval, created = AIEvaluation.objects.get_or_create(idea=idea, defaults={
+            'concept_score': ai_res.get('concept_score', 5),
+            'feasibility_score': ai_res.get('feasibility_score', 5),
+            'application_score': ai_res.get('application_score', 5),
+            'overall_notes': ai_res.get('overall_notes', '')
+        })
+        if not created:
+            ai_eval.concept_score = ai_res.get('concept_score', 5)
+            ai_eval.feasibility_score = ai_res.get('feasibility_score', 5)
+            ai_eval.application_score = ai_res.get('application_score', 5)
+            ai_eval.overall_notes = ai_res.get('overall_notes', '')
+            ai_eval.save()
 
         return Response({'detail': 'تم تحديث الفكرة بنجاح.'}, status=status.HTTP_200_OK)
 
