@@ -64,20 +64,48 @@ export function createChatWidget(ideaId) {
     return messagesDiv.lastElementChild;
   }
 
+  // Fetch history
+  apiFetch(`/ideas/${ideaId}/chat_history/`)
+    .then(history => {
+      if (history && history.length > 0) {
+        messagesDiv.innerHTML = '';
+        firstMsg = false;
+        history.forEach(msg => {
+          const cls = msg.is_bot ? 'msg-ai' : 'msg-user';
+          const el = document.createElement('div');
+          el.className = cls;
+          el.textContent = msg.message;
+          messagesDiv.appendChild(el);
+        });
+        scrollBottom();
+      }
+    })
+    .catch(err => console.error('Failed to load chat history:', err));
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = input.value.trim();
     if (!text) return;
 
     // User bubble
-    appendMsg(`<div class="msg-user">${escapeHTML(text)}</div>`);
+    const userEl = document.createElement('div');
+    userEl.className = 'msg-user';
+    userEl.textContent = text;
+    if (firstMsg) { messagesDiv.innerHTML = ''; firstMsg = false; }
+    messagesDiv.appendChild(userEl);
+    scrollBottom();
+
     input.value = '';
     input.disabled = true;
     sendBtn.disabled = true;
     sendBtn.style.opacity = '.5';
 
     // AI thinking bubble
-    const thinkEl = appendMsg(`<div class="msg-ai thinking">جاري التفكير...</div>`);
+    const thinkEl = document.createElement('div');
+    thinkEl.className = 'msg-ai thinking';
+    thinkEl.textContent = 'جاري التفكير...';
+    messagesDiv.appendChild(thinkEl);
+    scrollBottom();
 
     try {
       const response = await apiFetch(`/ideas/${ideaId}/chat/`, {

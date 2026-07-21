@@ -16,6 +16,17 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
+    // Load history
+    apiFetch('/ideas/general_chat_history/')
+        .then(history => {
+            if (history && history.length > 0) {
+                history.forEach(msg => {
+                    addMessage(msg.message, !msg.is_bot);
+                });
+            }
+        })
+        .catch(err => console.error("Failed to load history", err));
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const text = input.value.trim();

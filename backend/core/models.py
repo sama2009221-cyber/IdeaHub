@@ -82,3 +82,14 @@ class IdeaFile(models.Model):
 
     def __str__(self):
         return self.file.name
+
+class AIChatMessage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_messages')
+    idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name='chat_messages', blank=True, null=True)
+    message_text = models.TextField()
+    is_bot = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{'Bot' if self.is_bot else 'User'} - {self.created_at}"

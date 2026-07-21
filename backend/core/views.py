@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import authenticate
-from .models import User, Idea, IdeaVersion, Comment, IdeaEvaluation, AIEvaluation, IdeaFile
+from .models import User, Idea, IdeaVersion, Comment, IdeaEvaluation, AIEvaluation, IdeaFile, AIChatMessage
 from .serializers import UserSerializer, RegisterSerializer, IdeaSerializer, IdeaVersionSerializer, CommentSerializer, IdeaEvaluationSerializer, AIEvaluationSerializer
 from .ai_service import evaluate_idea, chat_with_ideas
 
@@ -129,6 +129,13 @@ class IdeaViewSet(viewsets.ModelViewSet):
             overall_notes=ai_res.get('overall_notes', ''),
         )
 
+    @action(detail=False, methods=['get'])
+    def general_chat_history(self, request):
+        """Fetch chat history for the general RAG chatbot."""
+        messages = AIChatMessage.objects.filter(user=request.user, idea__isnull=True).order_by('created_at')
+        data = [{"is_bot": msg.is_bot, "message": msg.message_text} for msg in messages]
+        return Response(data)
+
     @action(detail=False, methods=['post'])
     def rag_chat(self, request):
         """
@@ -138,6 +145,9 @@ class IdeaViewSet(viewsets.ModelViewSet):
         question = request.data.get('question', '').strip()
         if not question:
             return Response({'answer': 'الرجاء إدخال سؤال.'})
+
+        # Save user message
+        AIChatMessage.objects.create(user=request.user, idea=None, message_text=question, is_bot=False)
 
         ideas = (self.get_queryset()
                  .select_related('owner', 'ai_evaluation')
@@ -189,7 +199,18 @@ class IdeaViewSet(viewsets.ModelViewSet):
 
         context = "\n\n".join(context_parts) if context_parts else "No ideas have been submitted yet."
         answer = chat_with_ideas(question, context)
+
+        # Save bot response
+        AIChatMessage.objects.create(user=request.user, idea=None, message_text=answer, is_bot=True)
         return Response({"answer": answer})
+
+    @action(detail=True, methods=['get'])
+    def chat_history(self, request, pk=None):
+        """Fetch chat history for a specific idea chatbot."""
+        idea = self.get_object()
+        messages = AIChatMessage.objects.filter(user=request.user, idea=idea).order_by('created_at')
+        data = [{"is_bot": msg.is_bot, "message": msg.message_text} for msg in messages]
+        return Response(data)
 
     @action(detail=True, methods=['post'])
     def chat(self, request, pk=None):
@@ -200,6 +221,9 @@ class IdeaViewSet(viewsets.ModelViewSet):
         message = request.data.get('message', '').strip()
         if not message:
             return Response({'reply': 'الرجاء إدخال رسالة.'})
+
+        # Save user message
+        AIChatMessage.objects.create(user=request.user, idea=idea, message_text=message, is_bot=False)
 
         latest_version = idea.versions.order_by('-version_number').first()
         ai_eval = getattr(idea, 'ai_evaluation', None)
@@ -229,7 +253,71 @@ class IdeaViewSet(viewsets.ModelViewSet):
 
         context = "\n".join(context_parts)
         answer = chat_with_ideas(message, context)
+
+        # Save bot response
+        AIChatMessage.objects.create(user=request.user, idea=idea, message_text=answer, is_bot=True)
         return Response({"reply": answer})
+
+    def destroy(self, request, *args, **kwargs):
+        """Delete an idea. Only allowed for owner if not yet evaluated."""
+        idea = self.get_object()
+        if idea.owner != request.user:
+            return Response({'detail': 'غير مصرح لك بحذف هذه الفكرة.'}, status=status.HTTP_403_FORBIDDEN)
+        if idea.status not in ['draft', 'submitted']:
+            return Response({'detail': 'لا يمكن حذف فكرة قيد المراجعة أو مقيمة.'}, status=status.HTTP_400_BAD_REQUEST)
+        return super().destroy(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        """Edit an idea. Creates a new version. Only allowed for owner if not yet evaluated."""
+        idea = self.get_object()
+        if idea.owner != request.user:
+            return Response({'detail': 'غير مصرح لك بتعديل هذه الفكرة.'}, status=status.HTTP_403_FORBIDDEN)
+        if idea.status not in ['draft', 'submitted']:
+            return Response({'detail': 'لا يمكن تعديل فكرة قيد المراجعة أو مقيمة.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Update title/category if provided
+        title = request.data.get('title', idea.title)
+        idea.title = title
+        idea.save()
+
+        # Create new version
+        latest_version = idea.versions.order_by('-version_number').first()
+        v_num = (latest_version.version_number + 1) if latest_version else 1
+        
+        description = request.data.get('description', latest_version.description if latest_version else 'No description')
+        problem = request.data.get('problem', latest_version.problem if latest_version else '')
+        approach = request.data.get('approach', latest_version.approach if latest_version else '')
+        impact = request.data.get('impact', latest_version.impact if latest_version else '')
+
+        IdeaVersion.objects.create(
+            idea=idea,
+            version_number=v_num,
+            description=description,
+            problem=problem,
+            approach=approach,
+            impact=impact
+        )
+
+        return Response({'detail': 'تم تحديث الفكرة بنجاح.'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['delete'])
+    def delete_file(self, request, pk=None):
+        """Delete a specific file from the idea."""
+        idea = self.get_object()
+        if idea.owner != request.user:
+            return Response({'detail': 'غير مصرح لك.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        file_id = request.data.get('file_id')
+        if not file_id:
+            return Response({'detail': 'معرف الملف مفقود.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            idea_file = idea.files.get(id=file_id)
+            idea_file.file.delete(save=False) # Delete actual file
+            idea_file.delete() # Delete DB record
+            return Response({'detail': 'تم حذف الملف بنجاح.'}, status=status.HTTP_200_OK)
+        except IdeaFile.DoesNotExist:
+            return Response({'detail': 'الملف غير موجود.'}, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=True, methods=['get', 'post'])
     def comments(self, request, pk=None):
