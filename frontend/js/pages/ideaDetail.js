@@ -54,6 +54,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('owner-actions').classList.remove('hidden');
         }
 
+        const isManager = ['manager', 'owner'].includes(currentUser.role);
+        const canDecide = isManager && idea.status === 'under_review';
+        if (canDecide) {
+            document.getElementById('manager-actions').classList.remove('hidden');
+            
+            document.getElementById('btn-approve-idea').addEventListener('click', async () => {
+                if (confirm('هل أنت متأكد من اعتماد الفكرة لبدء التنفيذ؟')) {
+                    try {
+                        await apiFetch(`/ideas/${ideaId}/execute_decision/`, { method: 'POST', body: { decision: 'approved' } });
+                        window.location.reload();
+                    } catch (err) { alert('خطأ: ' + err.message); }
+                }
+            });
+
+            document.getElementById('btn-reject-idea').addEventListener('click', async () => {
+                if (confirm('هل أنت متأكد من رفض الفكرة؟')) {
+                    try {
+                        await apiFetch(`/ideas/${ideaId}/execute_decision/`, { method: 'POST', body: { decision: 'rejected' } });
+                        window.location.reload();
+                    } catch (err) { alert('خطأ: ' + err.message); }
+                }
+            });
+        }
+
         let latestVersion = null;
         if (idea.versions && idea.versions.length > 0) {
             latestVersion = idea.versions[idea.versions.length - 1];

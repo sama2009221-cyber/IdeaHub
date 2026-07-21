@@ -4,8 +4,8 @@ import { requireAuth } from '../auth.js';
 document.addEventListener('DOMContentLoaded', async () => {
     requireAuth();
 
-    const statusLabel = { submitted: "قيد المراجعة", progress: "قيد التنفيذ", approved: "مقبولة", rejected: "مرفوضة", done: "مُقيَّمة" };
-    const statusClass = { submitted: "review", progress: "progress", approved: "done", rejected: "review", done: "done" };
+    const statusLabel = { draft: "مسودة", submitted: "قيد المراجعة", progress: "قيد التنفيذ", approved: "قيد التنفيذ", rejected: "مرفوضة", under_review: "تم التقييم", needs_improvement: "تحتاج تعديل", done: "مُكتملة" };
+    const statusClass = { draft: "draft", submitted: "review", progress: "progress", approved: "done", rejected: "rejected", under_review: "under_review", needs_improvement: "rejected", done: "done" };
 
     function starRow(n) {
         let s = "";
@@ -22,10 +22,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         let desc = idea.versions && idea.versions.length > 0 ? idea.versions[0].description : 'لا يوجد وصف...';
         if (desc.length > 100) desc = desc.substring(0, 100) + '...';
 
-        return `<div class="card" tabindex="0" onclick="window.location.href='idea-detail.html?id=${idea.id}'">
+        return `<div class="card card-hover card-animated" tabindex="0" onclick="window.location.href='idea-detail.html?id=${idea.id}'">
     <div class="card-top">
       <h3>${idea.title}</h3>
-      <span class="badge ${statusClass[idea.status] || 'review'}">${statusLabel[idea.status] || idea.status}</span>
+      <span class="badge badge-${statusClass[idea.status] || 'review'}">${statusLabel[idea.status] || idea.status}</span>
     </div>
     <p>${desc}</p>
     <div class="card-foot">
@@ -62,21 +62,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const newGrid = document.getElementById('newIdeasGrid');
     const evalGrid = document.getElementById('evalGrid');
+    const negativeGrid = document.getElementById('negativeGrid');
     const statsEl = document.getElementById('stats');
 
     newGrid.innerHTML = skeletonHTML() + skeletonHTML() + skeletonHTML();
     evalGrid.innerHTML = skeletonHTML() + skeletonHTML() + skeletonHTML();
+    if (negativeGrid) negativeGrid.innerHTML = skeletonHTML() + skeletonHTML() + skeletonHTML();
 
     try {
         const ideas = await apiFetch('/ideas/');
         
-        const newIdeas = ideas.filter(i => i.status === 'submitted');
-        const evalIdeas = ideas.filter(i => i.status !== 'submitted');
+        const newIdeas = ideas.filter(i => i.status === 'submitted' || i.status === 'draft');
+        const evalIdeas = ideas.filter(i => ['under_review', 'approved', 'progress', 'done'].includes(i.status));
+        const negativeIdeas = ideas.filter(i => ['needs_improvement', 'rejected'].includes(i.status));
 
         const total = ideas.length;
         const review = newIdeas.length;
-        const progress = ideas.filter(i => i.status === 'progress').length;
-        const done = ideas.filter(i => i.status === 'approved' || i.status === 'done').length;
+        const progress = ideas.filter(i => ['approved', 'progress'].includes(i.status)).length;
+        const done = ideas.filter(i => ['under_review', 'approved', 'progress', 'done', 'needs_improvement', 'rejected'].includes(i.status)).length; // Evaluated means anything that is no longer 'submitted' or 'draft'
 
         const items = [
             { label: "إجمالي الأفكار", num: total, color: "#7C6CF6", bg: "rgba(124,108,246,.14)", icon: '<path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z" stroke="#7C6CF6" stroke-width="1.6" stroke-linejoin="round"/>' },
@@ -95,10 +98,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 </div>`).join('');
 
         newGrid.innerHTML = newIdeas.length ? newIdeas.map(cardHTML).join('') : emptyHTML("مفيش أفكار جديدة دلوقتي", "أول ما حد يقدّم فكرة جديدة هتظهر هنا عشان تتراجع.");
-        evalGrid.innerHTML = evalIdeas.length ? evalIdeas.map(cardHTML).join('') : emptyHTML("مفيش أفكار متقيّمة لسه", "لما تقيّم فكرة من اللي قيد المراجعة، هتظهر هنا.");
+        evalGrid.innerHTML = evalIdeas.length ? evalIdeas.map(cardHTML).join('') : emptyHTML("مفيش أفكار متقيّمة لسه", "الأفكار اللي دخلت حيز التنفيذ أو في انتظار الاعتماد هتظهر هنا.");
+        if (negativeGrid) negativeGrid.innerHTML = negativeIdeas.length ? negativeIdeas.map(cardHTML).join('') : emptyHTML("مفيش أفكار سلبية", "كل الأفكار الحالية ممتازة!");
         
         document.getElementById('newCount').textContent = newIdeas.length;
         document.getElementById('evalCount').textContent = evalIdeas.length;
+        if (document.getElementById('negativeCount')) document.getElementById('negativeCount').textContent = negativeIdeas.length;
 
     } catch (error) {
         console.error("Failed to fetch ideas", error);

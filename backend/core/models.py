@@ -21,6 +21,7 @@ class Idea(models.Model):
         ('draft', 'Draft'),
         ('submitted', 'Submitted'),
         ('under_review', 'Under Review'),
+        ('needs_improvement', 'Needs Improvement'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
     ], default='draft')

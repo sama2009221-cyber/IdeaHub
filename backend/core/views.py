@@ -386,12 +386,36 @@ class IdeaViewSet(viewsets.ModelViewSet):
         )
         if serializer.is_valid():
             serializer.save()
-            # Update idea status to under_review once it gets its first evaluation
-            if idea.status == 'submitted':
+            
+            # Update idea status based on numeric score
+            numeric_score = serializer.validated_data.get('numeric_score', 0)
+            if numeric_score <= 4:
+                idea.status = 'needs_improvement'
+            else:
                 idea.status = 'under_review'
-                idea.save(update_fields=['status'])
+            idea.save(update_fields=['status'])
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def execute_decision(self, request, pk=None):
+        """Manager decision to start execution (approved) or reject the idea."""
+        if request.user.role == 'employee':
+            return Response(
+                {'detail': 'الموظفون غير مسموح لهم باتخاذ قرار التنفيذ. هذه الصلاحية للمدراء والملاك فقط.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        idea = self.get_object()
+        decision = request.data.get('decision')
+        
+        if decision not in ['approved', 'rejected']:
+            return Response({'detail': 'قرار غير صالح. يجب أن يكون approved أو rejected.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        idea.status = decision
+        idea.save(update_fields=['status'])
+        return Response({'detail': f'تم تحديث حالة الفكرة إلى {idea.get_status_display()}'}, status=status.HTTP_200_OK)
 
 
 class IdeaVersionViewSet(viewsets.ModelViewSet):
