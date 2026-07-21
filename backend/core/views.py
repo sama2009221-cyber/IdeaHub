@@ -21,11 +21,9 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         # Try to find user by email first
         user = None
-        try:
-            u = User.objects.get(email__iexact=login)
+        u = User.objects.filter(email__iexact=login).first()
+        if u:
             user = authenticate(request=self.context.get('request'), username=u.username, password=password)
-        except User.DoesNotExist:
-            pass
 
         # Fallback: try by username
         if user is None:
