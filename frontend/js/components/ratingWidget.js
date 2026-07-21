@@ -8,19 +8,19 @@ export function createRatingWidget(ideaId, initialRating = null) {
     const role = localStorage.getItem('user_role');
     if (role === 'employee') {
         container.innerHTML = `
-            <h3 style="margin-bottom: var(--space-16); font-size: var(--text-lg); color: var(--text-secondary);">Your Evaluation</h3>
+            <h3 style="margin-bottom: var(--space-16); font-size: var(--text-lg); color: var(--text-secondary);">تقييمك الخاص</h3>
             <div style="color: var(--text-muted); font-size: var(--text-sm); font-style: italic;">
-                Evaluations are restricted to Managers and Owners.
+                التقييم متاح فقط للمديرين وأصحاب الصلاحية.
             </div>
         `;
         return container;
     }
 
     container.innerHTML = `
-        <h3 style="margin-bottom: var(--space-16); font-size: var(--text-lg);">Your Evaluation</h3>
+        <h3 style="margin-bottom: var(--space-16); font-size: var(--text-lg);">تقييمك الخاص</h3>
         <form id="rating-form">
             <div class="form-group">
-                <label class="form-label">Star Rating (Overall Impression)</label>
+                <label class="form-label">التقييم بالنجوم (الانطباع العام)</label>
                 <div id="star-rating" style="display: flex; gap: 8px; font-size: 24px; cursor: pointer; color: var(--text-muted); margin-bottom: 8px;">
                     <i class="ph-bold ph-star" data-value="1"></i>
                     <i class="ph-bold ph-star" data-value="2"></i>
@@ -31,18 +31,18 @@ export function createRatingWidget(ideaId, initialRating = null) {
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="numeric-score">Numerical Score (1-10)</label>
-                <input type="number" id="numeric-score" class="form-input mono-text" min="1" max="10" required value="${initialRating ? initialRating.numeric_score : ''}">
+                <label class="form-label" for="numeric-score">التقييم الرقمي (١-١٠)</label>
+                <input type="number" id="numeric-score" class="form-input mono-text" min="1" max="10" required placeholder="مثال: 8" value="${initialRating ? initialRating.numeric_score : ''}">
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="feedback">Professional Feedback</label>
-                <textarea id="feedback" class="form-input" rows="4" placeholder="Share your strategic insights to help propel this idea forward!">${initialRating ? initialRating.feedback_text : ''}</textarea>
+                <label class="form-label" for="feedback">ملاحظات التقييم</label>
+                <textarea id="feedback" class="form-input" rows="4" placeholder="شاركنا برأيك الاستراتيجي للمساعدة في تطوير هذه الفكرة!">${initialRating ? initialRating.feedback_text : ''}</textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary w-full">Submit Strategic Evaluation</button>
+            <button type="submit" class="btn btn-primary w-full">إرسال التقييم</button>
             <div id="rating-error" class="hidden" style="color: var(--danger); margin-top: var(--space-8); font-size: var(--text-sm);"></div>
-            <div id="rating-success" class="hidden" style="color: var(--success); margin-top: var(--space-8); font-size: var(--text-sm);">Evaluation saved!</div>
+            <div id="rating-success" class="hidden" style="color: var(--success); margin-top: var(--space-8); font-size: var(--text-sm);">تم حفظ التقييم بنجاح!</div>
         </form>
     `;
 
