@@ -4,6 +4,4 @@ builder = "NIXPACKS"
 [deploy]
 releaseCommand = "cd backend && python manage.py migrate --noinput"
 startCommand = "cd backend && gunicorn backend.wsgi --bind 0.0.0.0:$PORT"
-healthcheckPath = "/api/auth/register/"
-healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
