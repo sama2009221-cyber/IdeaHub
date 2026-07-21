@@ -41,13 +41,18 @@ document.addEventListener('DOMContentLoaded', () => {
             
         } catch (error) {
             let errorText = 'فشل التسجيل: ';
-            if (error.payload) {
+            if (error.payload && Object.keys(error.payload).length > 0) {
                 if (error.payload.username) errorText += 'الاسم مسجل مسبقاً. ';
                 if (error.payload.email) errorText += 'هذا البريد الإلكتروني مسجل مسبقاً. ';
                 if (error.payload.password) errorText += 'كلمة المرور غير صالحة. ';
                 if (error.payload.detail) errorText += error.payload.detail;
+                // Show raw error for debugging
+                const allErrors = Object.entries(error.payload).map(([k,v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join(' | ');
+                if (allErrors) errorText += allErrors;
+            } else if (error.status) {
+                errorText += `خطأ ${error.status} - يرجى المحاولة مرة أخرى.`;
             } else {
-                errorText += 'يرجى المحاولة مرة أخرى (ربما الخادم قيد التحديث الآن).';
+                errorText += 'تعذّر الاتصال بالخادم. يرجى المحاولة مرة أخرى.';
             }
             errorMsg.textContent = errorText;
             errorMsg.classList.remove('hidden');
