@@ -371,9 +371,16 @@ class IdeaViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['get', 'post'])
     def evaluate(self, request, pk=None):
-        """Submit a human evaluation (numeric score + written feedback) for an idea."""
+        """Fetch or submit human evaluations for an idea."""
+        idea = self.get_object()
+        
+        if request.method == 'GET':
+            evaluations = idea.evaluations.all().select_related('evaluator').order_by('-created_at')
+            serializer = IdeaEvaluationSerializer(evaluations, many=True)
+            return Response(serializer.data)
+
         if request.user.role == 'employee':
             return Response(
                 {'detail': 'الموظفون غير مسموح لهم بتقييم الأفكار. هذه الصلاحية للمدراء والملاك فقط.'},

@@ -208,6 +208,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('comments-thread-container').innerHTML = '';
         document.getElementById('comments-thread-container').appendChild(createCommentThread(ideaId));
         
+        // Fetch and display human evaluations
+        const evalContainer = document.getElementById('human-eval-container');
+        evalContainer.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-dim);"><p>جاري التحميل...</p></div>';
+        try {
+            const evals = await apiFetch(`/ideas/${ideaId}/evaluate/`);
+            if (evals && evals.length > 0) {
+                let html = '<div style="display:flex; flex-direction:column; gap:16px;">';
+                evals.forEach(ev => {
+                    let stars = '';
+                    for (let i = 0; i < 10; i++) {
+                        stars += `<svg viewBox="0 0 24 24" fill="${i < ev.numeric_score ? '#F2B84B' : 'none'}" stroke="${i < ev.numeric_score ? '#F2B84B' : 'var(--border)'}" stroke-width="1.4" style="width:16px;height:16px;"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.6 6.8L12 16.9 5.8 20.4l1.6-6.8L2.2 9l6.9-.7L12 2z"/></svg>`;
+                    }
+                    html += `
+                    <div style="background:var(--surface-2); border:1px solid var(--border-soft); border-radius:12px; padding:16px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+                            <strong style="color:var(--text); font-size:14px;">المدير: ${ev.evaluator_name}</strong>
+                            <div style="display:flex; gap:2px;">${stars} <span style="font-size:12px; margin-inline-start:8px; color:var(--text-dim);">${ev.numeric_score}/10</span></div>
+                        </div>
+                        <div style="font-size:13.5px; color:var(--text-dim); line-height:1.6; white-space:pre-wrap;">${escapeHTML(ev.feedback)}</div>
+                    </div>`;
+                });
+                html += '</div>';
+                evalContainer.innerHTML = html;
+            } else {
+                evalContainer.innerHTML = '<div style="text-align:center; padding: 30px; color: var(--text-faint); font-size:13.5px;">لا توجد تقييمات من المديرين حتى الآن.</div>';
+            }
+        } catch (e) {
+            evalContainer.innerHTML = '<div style="color:var(--red); font-size:13px;">فشل تحميل التقييمات.</div>';
+        }
+
         document.getElementById('ai-notes-container').innerHTML = '';
         document.getElementById('ai-notes-container').appendChild(createAINotesPanel(idea.ai_evaluation));
         
