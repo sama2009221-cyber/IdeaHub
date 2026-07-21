@@ -73,7 +73,6 @@ export function createRatingWidget(ideaId, initialRating = null) {
         const outOf5 = (score || 0) / 2;
         for (let i = 1; i <= 5; i++) {
             const starWrapper = document.createElement('div');
-            starWrapper.style.cursor = 'pointer';
             starWrapper.dataset.index = i;
             
             if (outOf5 >= i) {
@@ -84,20 +83,6 @@ export function createRatingWidget(ideaId, initialRating = null) {
                 starWrapper.innerHTML = starEmpty;
             }
 
-            // Click handling (Left half = half star, Right half = full star)
-            starWrapper.addEventListener('click', (e) => {
-                const rect = starWrapper.getBoundingClientRect();
-                const clickX = e.clientX - rect.left;
-                // In RTL, left is full, right is half (but let's keep it intuitive)
-                // If clicked on the right side of the star (in LTR, right = full, but we are RTL so right is half)
-                // Let's just use simple mapping for now: click index = full star. 
-                // To support half stars via click, we can check width.
-                const isHalfClick = (clickX > rect.width / 2); // since we are RTL, click on right side means lower value (half)
-                
-                let newScore = isHalfClick ? (i * 2) - 1 : (i * 2);
-                numericScoreInput.value = newScore;
-                renderStars(newScore);
-            });
             starsContainer.appendChild(starWrapper);
         }
     }
