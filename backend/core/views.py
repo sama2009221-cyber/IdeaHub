@@ -267,15 +267,6 @@ class IdeaViewSet(viewsets.ModelViewSet):
         AIChatMessage.objects.create(user=request.user, idea=idea, message_text=answer, is_bot=True)
         return Response({"reply": answer})
 
-    def destroy(self, request, *args, **kwargs):
-        """Delete an idea. Only allowed for owner if not yet evaluated."""
-        idea = self.get_object()
-        if idea.owner != request.user:
-            return Response({'detail': 'غير مصرح لك بحذف هذه الفكرة.'}, status=status.HTTP_403_FORBIDDEN)
-        if idea.status not in ['draft', 'submitted']:
-            return Response({'detail': 'لا يمكن حذف فكرة قيد المراجعة أو مقيمة.'}, status=status.HTTP_400_BAD_REQUEST)
-        return super().destroy(request, *args, **kwargs)
-
     def update(self, request, *args, **kwargs):
         """Edit an idea. Creates a new version. Only allowed for owner if not yet evaluated."""
         idea = self.get_object()
