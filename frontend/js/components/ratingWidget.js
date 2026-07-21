@@ -35,12 +35,8 @@ export function createRatingWidget(ideaId, initialRating = null) {
             <form id="rating-form">
                 <div class="form-group">
                     <label class="form-label" style="font-size:12px; font-weight:700; color:var(--text-faint); text-transform:uppercase; margin-bottom:10px; display:block;">التقييم بالنجوم (الانطباع العام)</label>
-                    <div id="star-rating" style="display: flex; gap: 8px; font-size: 26px; cursor: pointer; color: var(--surface-3); margin-bottom: 20px;">
-                        <i class="ph-bold ph-star" data-value="1"></i>
-                        <i class="ph-bold ph-star" data-value="2"></i>
-                        <i class="ph-bold ph-star" data-value="3"></i>
-                        <i class="ph-bold ph-star" data-value="4"></i>
-                        <i class="ph-bold ph-star" data-value="5"></i>
+                    <div id="star-rating" style="display: flex; gap: 8px; cursor: pointer; margin-bottom: 20px;">
+                        <!-- SVGs will be injected via JS -->
                     </div>
                 </div>
 
@@ -64,26 +60,57 @@ export function createRatingWidget(ideaId, initialRating = null) {
     const form = container.querySelector('#rating-form');
     const errorDiv = container.querySelector('#rating-error');
     const successDiv = container.querySelector('#rating-success');
-    const stars = container.querySelectorAll('#star-rating i');
+    const starsContainer = container.querySelector('#star-rating');
     const numericScoreInput = container.querySelector('#numeric-score');
 
-    // Star rating logic
-    stars.forEach(star => {
-        star.addEventListener('click', (e) => {
-            const value = parseInt(e.target.dataset.value);
-            // Update stars visually
-            stars.forEach(s => {
-                if (parseInt(s.dataset.value) <= value) {
-                    s.classList.replace('ph-bold', 'ph-fill');
-                    s.style.color = 'gold';
-                } else {
-                    s.classList.replace('ph-fill', 'ph-bold');
-                    s.style.color = 'var(--text-muted)';
-                }
+    // SVG templates
+    const starEmpty = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" style="color:var(--surface-3);"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+    const starHalf = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" style="color:#fbbf24;"><defs><linearGradient id="half"><stop offset="50%" stop-color="#fbbf24"/><stop offset="50%" stop-color="transparent" stop-opacity="1"/></linearGradient></defs><path fill="url(#half)" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+    const starFull = `<svg width="28" height="28" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+
+    function renderStars(score) {
+        starsContainer.innerHTML = '';
+        const outOf5 = (score || 0) / 2;
+        for (let i = 1; i <= 5; i++) {
+            const starWrapper = document.createElement('div');
+            starWrapper.style.cursor = 'pointer';
+            starWrapper.dataset.index = i;
+            
+            if (outOf5 >= i) {
+                starWrapper.innerHTML = starFull;
+            } else if (outOf5 >= i - 0.5) {
+                starWrapper.innerHTML = starHalf;
+            } else {
+                starWrapper.innerHTML = starEmpty;
+            }
+
+            // Click handling (Left half = half star, Right half = full star)
+            starWrapper.addEventListener('click', (e) => {
+                const rect = starWrapper.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                // In RTL, left is full, right is half (but let's keep it intuitive)
+                // If clicked on the right side of the star (in LTR, right = full, but we are RTL so right is half)
+                // Let's just use simple mapping for now: click index = full star. 
+                // To support half stars via click, we can check width.
+                const isHalfClick = (clickX > rect.width / 2); // since we are RTL, click on right side means lower value (half)
+                
+                let newScore = isHalfClick ? (i * 2) - 1 : (i * 2);
+                numericScoreInput.value = newScore;
+                renderStars(newScore);
             });
-            // Update numeric score (1 star = 2 points)
-            numericScoreInput.value = value * 2;
-        });
+            starsContainer.appendChild(starWrapper);
+        }
+    }
+
+    // Initialize stars
+    renderStars(parseInt(numericScoreInput.value) || 0);
+
+    // Sync stars when input changes
+    numericScoreInput.addEventListener('input', () => {
+        let val = parseInt(numericScoreInput.value);
+        if (val > 10) { val = 10; numericScoreInput.value = 10; }
+        if (val < 1) { val = 1; numericScoreInput.value = 1; }
+        renderStars(val);
     });
 
     form.addEventListener('submit', async (e) => {
